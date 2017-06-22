@@ -53,8 +53,18 @@ Some code based on previous work by Michael Kliewe/PHPGangsta
 ### Notes -
 1. Installing this module will update the AdminUser table in the Magento database to add a twofactor_google_secret
 field for storing the local GA key. It is safe to remove this field once the module is removed.
-1. If you get locked out of admin because of a settings issue, loss of your provider account or other software related issue, you can *temporarily disable* the second factor authentication - 
+1. If you get locked out of admin because of a settings issue, loss of your provider account or other software related issue, you can *temporarily disable* the second factor authentication -
  - Place a file named __tfaoff.flag__ in the root directory of your Magento installation.
  - Login to Magento's Admin area without the second factor.  
  - Update settings or disable Sentry
  - Remove the tfaoff.flag file to re-enable two factor authentication.
+
+### Known Issues
+
+1. Google authenticator code verification returns **Invalid Code** response.
+
+	Sometimes even after entering the current code from the google authenticator screen, you get an invalid code message from the module. If that is the case make sure the time stamp on the server is up-to-date. The authentication mechanism uses a time slice logic to verify the code. If the server time is not in sync with the ntp servers the invalid code response is expected.
+
+	If you find the server is not in sync, perform the following actions
+	- Install ntpdate `sudo yum install ntpdate`
+	- Run `sudo ntpdate pool.ntp.org`
