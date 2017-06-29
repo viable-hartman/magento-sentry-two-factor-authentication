@@ -2,7 +2,7 @@
 <config>
     <modules>
         <HE_TwoFactorAuth>
-            <version>1.0.4</version>
+            <version>1.1.0</version>
         </HE_TwoFactorAuth>
     </modules>
     <global>
@@ -66,6 +66,27 @@
 
     <adminhtml>
         <events>
+            <!--
+                The 2FA module, breaks when password is expired for an user.
+                We disable the default magento observer `enterprise_pci`
+                and fire a custom event `twofactor_auth_verification_success`
+                to manually call the observer method
+            -->
+            <admin_user_authenticate_after>
+                <observers>
+                    <enterprise_pci>
+                        <type>disabled</type>
+                    </enterprise_pci>
+                </observers>
+            </admin_user_authenticate_after>
+            <twofactor_auth_verification_success>
+                <observers>
+                    <sd_enterprise_pci>
+                        <class>he_twofactorauth/observer</class>
+                        <method>callAdminAuthenticate</method>
+                        </sd_enterprise_pci>
+               </observers>
+            </twofactor_auth_verification_success>
             <admin_session_user_login_success>
                 <observers>
                     <he_twofactorauth_observer>

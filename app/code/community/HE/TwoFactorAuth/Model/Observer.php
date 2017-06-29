@@ -228,4 +228,28 @@ class HE_TwoFactorAuth_Model_Observer
             }
         }
     }
+
+    public function callAdminAuthenticate($observer)
+    {
+        if (Mage::getEdition() != "Enterprise") {
+            return;
+        }
+        Mage::getModel('enterprise_pci/observer')->adminAuthenticate($observer);
+        /*
+            Ideally, the PCI observer method adminAuthenticate looks for the plain text password to be provided
+            Since, this controller action does not carry the plain text password, we are forced to provide the hashed password
+            Magento, thinks the hash is a new password and hashes the hash again.
+            This causes an invalid password error.
+            We perform an update query to reset this password to the admin_user.
+        */
+        $user = $observer->getUser();
+        /*
+            For a user, if the original data of password is set and the current password is null,
+            magento automatically sets the original data as the password
+        */
+        $password = $observer->getPassword();
+        $user->setOrigData('password', $password);
+        $user->setPassword();
+        $user->save();
+    }
 }
