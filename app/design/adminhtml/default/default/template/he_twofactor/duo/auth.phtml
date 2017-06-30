@@ -47,7 +47,7 @@ $ready = ($user && $sign_request && $auth_host);  // all have to be set
             The Duo Security Two-Factor Authentication is not configured correctly and has been disabled. <br/>
             Please use the link below to login and review the settings.<br/>
         <?php } ?>
-        <a href="<?php echo $this->getUrl('adminhtml/index/logout') ?>" class="link-logout"><?php echo $this->__('Return to the Login screen') ?></a>
+        <a href="<?php echo $this->getUrl('adminhtml/index/logout') ?>" class="link-logout"><?php echo Mage::helper('adminhtml')->__('Logout'); ?></a>
         </div>
             <div class="bottom"></div>
     </div>
