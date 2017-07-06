@@ -313,12 +313,4 @@ class HE_TwoFactorAuth_Adminhtml_TwofactorController extends Mage_Adminhtml_Cont
 
         return $this;
     }
-
-    /**
-        * Allow all admin users to access the 2fa forms
-    */
-    protected function _isAllowed()
-    {
-        return true;
-    }
 }
