@@ -237,7 +237,31 @@ class HE_TwoFactorAuth_Model_Observer
         if (Mage::getEdition() != "Enterprise") {
             return;
         }
-        Mage::getModel('enterprise_pci/observer')->adminAuthenticate($observer);
+
+        if ($observer->getEvent()->getName() == "admin_session_user_login_failed") {
+            // for a failed login attempt, we get the username to update lock expiration
+            $username = $observer->getUserName();
+            $user = Mage::getModel('admin/user')->loadByUsername($username);
+            $password = $user->getPassword();
+            $observer->getEvent()->setUser($user);
+            $observer->getEvent()->setPassword($password);
+            $observer->getEvent()->setResult(0);
+        }
+
+        try {
+            Mage::getModel('enterprise_pci/observer')->adminAuthenticate($observer);
+        } catch(Exception $e) {
+            if ($e->getMessage() == Mage::helper('core')->__('This account is locked.')) {
+            } else {
+                Mage::logException($e);
+            }
+            return;
+        }
+
+        if ($observer->getEvent()->getName() == "admin_session_user_login_failed") {
+            return;
+        }
+
         /*
             Ideally, the PCI observer method adminAuthenticate looks for the plain text password to be provided
             Since, this controller action does not carry the plain text password, we are forced to provide the hashed password
