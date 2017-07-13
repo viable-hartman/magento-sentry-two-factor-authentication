@@ -79,6 +79,14 @@
                     </enterprise_pci>
                 </observers>
             </admin_user_authenticate_after>
+            <admin_session_user_login_failed>
+                <observers>
+                    <sd_enterprise_pci>
+                        <class>he_twofactorauth/observer</class>
+                        <method>callAdminAuthenticate</method>
+                    </sd_enterprise_pci>
+               </observers>
+            </admin_session_user_login_failed>
             <twofactor_auth_verification_success>
                 <observers>
                     <sd_enterprise_pci>
