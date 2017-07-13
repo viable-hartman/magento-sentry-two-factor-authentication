@@ -248,7 +248,15 @@ class HE_TwoFactorAuth_Model_Observer
             $observer->getEvent()->setResult(0);
         }
 
-        Mage::getModel('enterprise_pci/observer')->adminAuthenticate($observer);
+        try {
+            Mage::getModel('enterprise_pci/observer')->adminAuthenticate($observer);
+        } catch(Exception $e) {
+            if ($e->getMessage() == Mage::helper('core')->__('This account is locked.')) {
+            } else {
+                Mage::logException($e);
+            }
+            return;
+        }
 
         if ($observer->getEvent()->getName() == "admin_session_user_login_failed") {
             return;
