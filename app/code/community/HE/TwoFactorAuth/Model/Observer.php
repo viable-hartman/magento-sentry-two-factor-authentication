@@ -255,6 +255,12 @@ class HE_TwoFactorAuth_Model_Observer
             } else {
                 Mage::logException($e);
             }
+            $adminSession = Mage::getSingleton('admin/session');
+            if ($adminSession->isLoggedIn()) {
+                // log out a locked user
+                $adminSession->unsetAll();
+                $adminSession->getCookie()->delete($adminSession->getSessionName());
+            }
             return;
         }
 
