@@ -232,7 +232,7 @@ class HE_TwoFactorAuth_Model_Observer
         }
     }
 
-    protected function getLoginCreds($observer, $result = false)
+    protected function _getLoginCreds($observer, $result = false)
     {
         $username = $observer->getUserName();
         $user = Mage::getModel('admin/user')->loadByUsername($username);
@@ -282,7 +282,7 @@ class HE_TwoFactorAuth_Model_Observer
 
         if ($observer->getEvent()->getName() == "admin_session_user_login_failed") {
             // for a failed login attempt, we get the username to update lock expiration
-            $observer = $this->getLoginCreds($observer);
+            $observer = $this->_getLoginCreds($observer);
         }
 
         try {
