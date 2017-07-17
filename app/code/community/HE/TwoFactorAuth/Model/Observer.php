@@ -232,6 +232,48 @@ class HE_TwoFactorAuth_Model_Observer
         }
     }
 
+    protected function getLoginCreds($observer, $result = false)
+    {
+        $username = $observer->getUserName();
+        $user = Mage::getModel('admin/user')->loadByUsername($username);
+        $password = $user->getPassword();
+        $observer->getEvent()->setUser($user);
+        $observer->getEvent()->setPassword($password);
+        $result = $result ? 1 : 0;
+        $observer->getEvent()->setResult($result);
+        return $observer;
+    }
+
+    protected function _setPasswordData($observer)
+    {
+        /*
+            Ideally, the PCI observer method adminAuthenticate looks for the plain text password to be provided
+            Since, this controller action does not carry the plain text password, we are forced to provide the hashed password
+            Magento, thinks the hash is a new password and hashes the hash again.
+            This causes an invalid password error.
+            We perform an update query to reset this password to the admin_user.
+        */
+        $user = $observer->getEvent()->getUser();
+        /*
+            For a user, if the original data of password is set and the current password is null,
+            magento automatically sets the original data as the password
+        */
+        $password = $observer->getEvent()->getPassword();
+        $user->setOrigData('password', $password);
+        $user->setPassword();
+        $user->save();
+    }
+
+    protected function _forceAdminUserLogout()
+    {
+        $adminSession = Mage::getSingleton('admin/session');
+        if ($adminSession->isLoggedIn()) {
+            // log out a locked user
+            $adminSession->unsetAll();
+            $adminSession->getCookie()->delete($adminSession->getSessionName());
+        }
+    }
+
     public function callAdminAuthenticate($observer)
     {
         if (Mage::getEdition() != "Enterprise") {
@@ -240,12 +282,7 @@ class HE_TwoFactorAuth_Model_Observer
 
         if ($observer->getEvent()->getName() == "admin_session_user_login_failed") {
             // for a failed login attempt, we get the username to update lock expiration
-            $username = $observer->getUserName();
-            $user = Mage::getModel('admin/user')->loadByUsername($username);
-            $password = $user->getPassword();
-            $observer->getEvent()->setUser($user);
-            $observer->getEvent()->setPassword($password);
-            $observer->getEvent()->setResult(0);
+            $observer = $this->getLoginCreds($observer);
         }
 
         try {
@@ -255,12 +292,8 @@ class HE_TwoFactorAuth_Model_Observer
             } else {
                 Mage::logException($e);
             }
-            $adminSession = Mage::getSingleton('admin/session');
-            if ($adminSession->isLoggedIn()) {
-                // log out a locked user
-                $adminSession->unsetAll();
-                $adminSession->getCookie()->delete($adminSession->getSessionName());
-            }
+            // If an admin is logged in and the user is locked, we force a logout action
+            $this->_forceAdminUserLogout();
             return;
         }
 
@@ -268,21 +301,7 @@ class HE_TwoFactorAuth_Model_Observer
             return;
         }
 
-        /*
-            Ideally, the PCI observer method adminAuthenticate looks for the plain text password to be provided
-            Since, this controller action does not carry the plain text password, we are forced to provide the hashed password
-            Magento, thinks the hash is a new password and hashes the hash again.
-            This causes an invalid password error.
-            We perform an update query to reset this password to the admin_user.
-        */
-        $user = $observer->getUser();
-        /*
-            For a user, if the original data of password is set and the current password is null,
-            magento automatically sets the original data as the password
-        */
-        $password = $observer->getPassword();
-        $user->setOrigData('password', $password);
-        $user->setPassword();
-        $user->save();
+        $this->_setPasswordData($observer);
+        return;
     }
 }
