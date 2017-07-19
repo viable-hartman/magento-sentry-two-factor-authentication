@@ -260,7 +260,18 @@ class HE_TwoFactorAuth_Model_Observer
         */
         $password = $observer->getEvent()->getPassword();
         $user->setOrigData('password', $password);
-        $user->setPassword();
+        /*
+         *  Add version compare to handle the different _beforeSave functionality in
+         *  Mage_Admin_Model_user.
+         *  In versions below 1.14.1.0, setPassword will assign the admin password to NULL,
+         *  therefore only allowing the admin user login once.
+         *  Checking for Enterprise occurs in the callAdminAuthenticate function
+         */
+        if (version_compare(Mage::getVersion(), '1.14.1.0', '>=')) {
+            $user->setPassword();
+        } else {
+            $user->setPassword($password);
+        }
         $user->save();
     }
 
