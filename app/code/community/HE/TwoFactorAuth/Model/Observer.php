@@ -313,6 +313,9 @@ class HE_TwoFactorAuth_Model_Observer
         }
 
         $this->_setPasswordData($observer);
+        // for some reason, the failure_num first_failure and lock_expires values are not reset on a successful login
+        $resource = Mage::getResourceSingleton('enterprise_pci/admin_user');
+        $resource->unlock($observer->getEvent()->getUser()->getId());
         return;
     }
 }
