@@ -157,8 +157,6 @@ class HE_TwoFactorAuth_Adminhtml_TwofactorController extends Mage_Adminhtml_Cont
                 ->setActionName('login')
                 ->setDispatched(false);
         } else {
-            $msg = Mage::helper('he_twofactorauth')->__("Valid code entered");
-            Mage::getSingleton('adminhtml/session')->addSuccess($msg);
             $this->_redirect('*');
         }
 
@@ -232,8 +230,6 @@ class HE_TwoFactorAuth_Adminhtml_TwofactorController extends Mage_Adminhtml_Cont
                             ->setActionName('login')
                             ->setDispatched(false);
                     } else {
-                        $msg = Mage::helper('he_twofactorauth')->__("Valid code entered");
-                        Mage::getSingleton('adminhtml/session')->addSuccess($msg);
                         $this->_redirect('*');
                     }
 
