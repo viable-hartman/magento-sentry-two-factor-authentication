@@ -305,9 +305,9 @@ class HE_TwoFactorAuth_Model_Observer
             }
             // If an admin is logged in and the user is locked, we force a logout action
             $this->_forceAdminUserLogout();
-            Mage::getModel('core/cookie')->set("admin_user_locked", 1);
             $lockInfo = $observer->getEvent()->getLockInfo();
             if ($lockInfo) {
+                // update lock info value, for the event dispatching controller to display error message
                 $lockInfo->setData("is_locked", true);
             }
             return $this;
