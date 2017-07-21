@@ -323,11 +323,4 @@ class HE_TwoFactorAuth_Model_Observer
         $resource->unlock($observer->getEvent()->getUser()->getId());
         return;
     }
-
-    public function adminhtmlBlockHtmlBefore(Varien_Event_Observer $observer)
-    {
-         if(Mage::getModel('core/cookie')->get("admin_user_locked")) {
-              Mage::getModel('core/cookie')->delete("admin_user_locked");
-         }
-    }
 }
