@@ -305,7 +305,12 @@ class HE_TwoFactorAuth_Model_Observer
             }
             // If an admin is logged in and the user is locked, we force a logout action
             $this->_forceAdminUserLogout();
-            return;
+            Mage::getModel('core/cookie')->set("admin_user_locked", 1);
+            $lockInfo = $observer->getEvent()->getLockInfo();
+            if ($lockInfo) {
+                $lockInfo->setData("is_locked", true);
+            }
+            return $this;
         }
 
         if ($observer->getEvent()->getName() == "admin_session_user_login_failed") {
@@ -317,5 +322,12 @@ class HE_TwoFactorAuth_Model_Observer
         $resource = Mage::getResourceSingleton('enterprise_pci/admin_user');
         $resource->unlock($observer->getEvent()->getUser()->getId());
         return;
+    }
+
+    public function adminhtmlBlockHtmlBefore(Varien_Event_Observer $observer)
+    {
+         if(Mage::getModel('core/cookie')->get("admin_user_locked")) {
+              Mage::getModel('core/cookie')->delete("admin_user_locked");
+         }
     }
 }

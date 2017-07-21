@@ -147,8 +147,20 @@ class HE_TwoFactorAuth_Adminhtml_TwofactorController extends Mage_Adminhtml_Cont
             ->set2faState(HE_TwoFactorAuth_Model_Validate::TFA_STATE_ACTIVE);
         $user = Mage::getSingleton('admin/session')->getUser();
         $password = $user->getPassword();
-        Mage::dispatchEvent('twofactor_auth_verification_success', array('password' => $password, 'user' => $user, 'result' => true));
-        $this->_redirect('*');
+        $lockInfo = new Varien_Object();
+        Mage::dispatchEvent('twofactor_auth_verification_success', array('password' => $password, 'user' => $user, 'result' => true, 'lock_info' => $lockInfo));
+        if ($lockInfo->getData('is_locked')) {
+            Mage::getSingleton('adminhtml/session')->addError(Mage::helper('adminhtml')->__('You did not sign in correctly or your account is temporarily disabled.'));
+            $this->getRequest()->setParam('forwarded', true)
+                ->setRouteName('adminhtml')
+                ->setControllerName('index')
+                ->setActionName('login')
+                ->setDispatched(false);
+        } else {
+            $msg = Mage::helper('he_twofactorauth')->__("Valid code entered");
+            Mage::getSingleton('adminhtml/session')->addSuccess($msg);
+            $this->_redirect('*');
+        }
 
         return $this;
     }
@@ -207,13 +219,23 @@ class HE_TwoFactorAuth_Adminhtml_TwofactorController extends Mage_Adminhtml_Cont
                         );
                     }
 
-                    $msg = Mage::helper('he_twofactorauth')->__("Valid code entered");
-                    Mage::getSingleton('adminhtml/session')->addSuccess($msg);
                     Mage::getSingleton('admin/session')->set2faState(HE_TwoFactorAuth_Model_Validate::TFA_STATE_ACTIVE);
                     $user = Mage::getSingleton('admin/session')->getUser();
                     $password = $user->getPassword();
-                    Mage::dispatchEvent('twofactor_auth_verification_success', array('password' => $password, 'user' => $user, 'result' => true));
-                    $this->_redirect('*');
+                    $lockInfo = new Varien_Object();
+                    Mage::dispatchEvent('twofactor_auth_verification_success', array('password' => $password, 'user' => $user, 'result' => true, 'lock_info' => $lockInfo));
+                    if ($lockInfo->getData('is_locked')) {
+                        Mage::getSingleton('adminhtml/session')->addError(Mage::helper('adminhtml')->__('You did not sign in correctly or your account is temporarily disabled.'));
+                        $this->getRequest()->setParam('forwarded', true)
+                            ->setRouteName('adminhtml')
+                            ->setControllerName('index')
+                            ->setActionName('login')
+                            ->setDispatched(false);
+                    } else {
+                        $msg = Mage::helper('he_twofactorauth')->__("Valid code entered");
+                        Mage::getSingleton('adminhtml/session')->addSuccess($msg);
+                        $this->_redirect('*');
+                    }
 
                     return $this;
                 } else {
