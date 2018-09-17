@@ -92,19 +92,23 @@
                         <input type="text" id="input_code" name="input_code" value="" class="required-entry input-text" style="width:461px;" autocomplete="off"/>
                     </div>
 
-                    <div class="tfa_trusted">
-                        <input
-                                id="tfa_trust_device"
-                                name="tfa_trust_device"
-                                value="1"
-                                data-bind='checked: checked'
-                                type="checkbox"
-                         />
+                    <?php if ($trustedHelper->isTrustedDevicesEnabled()): ?>
 
-                        <label for="tfa_trust_device">
-                            <span>Trust this device, do not ask again</span>
-                        </label>
-                    </div>
+                        <div class="tfa_trusted">
+                            <input
+                                    id="tfa_trust_device"
+                                    name="tfa_trust_device"
+                                    value="1"
+                                    data-bind='checked: checked'
+                                    type="checkbox"
+                             />
+
+                            <label for="tfa_trust_device">
+                                <span>Trust this device, do not ask again</span>
+                            </label>
+                        </div>
+
+                    <?php endif; ?>
                 <?php } ?>
 
                 <?php echo $this->getChildHtml('form.additional.info'); ?>
