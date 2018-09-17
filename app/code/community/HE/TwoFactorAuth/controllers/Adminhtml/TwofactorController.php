@@ -147,7 +147,6 @@ class HE_TwoFactorAuth_Adminhtml_TwofactorController extends Mage_Adminhtml_Cont
             ->set2faState(HE_TwoFactorAuth_Model_Validate::TFA_STATE_ACTIVE);
         $user = Mage::getSingleton('admin/session')->getUser();
         $password = $user->getPassword();
-        $this->handleTrustedDevice();
         $lockInfo = new Varien_Object();
         Mage::dispatchEvent('twofactor_auth_verification_success', array('password' => $password, 'user' => $user, 'result' => true, 'lock_info' => $lockInfo));
         if ($lockInfo->getData('is_locked')) {
