@@ -28,6 +28,13 @@ class HE_TwoFactorAuth_Model_Observer
             return;
         }
 
+        $trustedHelper = Mage::helper("he_twofactorauth/trusted");
+        $trustedModel = Mage::getModel("he_twofactorauth_resource/trusted");
+        if ($trustedHelper->isTrustedDevicesEnabled() && $trustedModel->findActivity()) {
+            Mage::getSingleton('admin/session')->set2faState(HE_TwoFactorAuth_Model_Validate::TFA_STATE_ACTIVE);
+            return;
+        }
+
         // check ip-whitelist
         if (Mage::helper('he_twofactorauth')->inWhitelist( Mage::helper('core/http')->getRemoteAddr() )) { 
             Mage::getSingleton('admin/session')->set2faState(HE_TwoFactorAuth_Model_Validate::TFA_STATE_ACTIVE);

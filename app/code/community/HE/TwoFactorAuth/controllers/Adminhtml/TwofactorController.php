@@ -147,6 +147,7 @@ class HE_TwoFactorAuth_Adminhtml_TwofactorController extends Mage_Adminhtml_Cont
             ->set2faState(HE_TwoFactorAuth_Model_Validate::TFA_STATE_ACTIVE);
         $user = Mage::getSingleton('admin/session')->getUser();
         $password = $user->getPassword();
+        $this->handleTrustedDevice();
         $lockInfo = new Varien_Object();
         Mage::dispatchEvent('twofactor_auth_verification_success', array('password' => $password, 'user' => $user, 'result' => true, 'lock_info' => $lockInfo));
         if ($lockInfo->getData('is_locked')) {
@@ -219,6 +220,7 @@ class HE_TwoFactorAuth_Adminhtml_TwofactorController extends Mage_Adminhtml_Cont
 
                     Mage::getSingleton('admin/session')->set2faState(HE_TwoFactorAuth_Model_Validate::TFA_STATE_ACTIVE);
                     $user = Mage::getSingleton('admin/session')->getUser();
+                    $this->handleTrustedDevice();
                     $password = $user->getPassword();
                     $lockInfo = new Varien_Object();
                     Mage::dispatchEvent('twofactor_auth_verification_success', array('password' => $password, 'user' => $user, 'result' => true, 'lock_info' => $lockInfo));
@@ -330,5 +332,15 @@ class HE_TwoFactorAuth_Adminhtml_TwofactorController extends Mage_Adminhtml_Cont
         $this->_redirect('*');
 
         return $this;
+    }
+
+    private function handleTrustedDevice()
+    {
+        $params = $this->getRequest()->getParams();
+        if (isset($params['tfa_trust_device'])) {
+            $user = Mage::getSingleton('admin/session')->getUser();
+            $trustedModel = Mage::getModel("he_twofactorauth_resource/trusted");
+            $trustedModel->addActivity($user->getId());
+        }
     }
 }

@@ -13,6 +13,11 @@
             </he_twofactorauth>
             <he_twofactorauth_resource>
                 <class>HE_TwoFactorAuth_Model_Resource</class>
+                <entities>
+                    <trusted>
+                        <table>he_twofactorauth_trusted</table>
+                    </trusted>
+                </entities>
             </he_twofactorauth_resource>
         </models>
         <blocks>
