@@ -53,7 +53,6 @@ class HE_TwoFactorAuth_Model_Resource_Trusted extends Mage_Core_Model_Resource_D
 
     public function findActivity()
     {
-        Mage::log("Finding activity", null, "tfa.log");
         $user = Mage::getSingleton('admin/session')->getUser();
         $userId = $user->getId();
         $ipAddress = $this->trustedHelper->getIpAddress();
@@ -64,7 +63,6 @@ class HE_TwoFactorAuth_Model_Resource_Trusted extends Mage_Core_Model_Resource_D
             ->addFieldToFilter("last_ip", array("eq" => $ipAddress))
             ->addFieldToFilter("user_id", array("eq" => $user->getId()))
             ->addFieldToFilter("token", array("eq" => $cookieToken));
-        Mage::log($tfaCollection->getSelect()->__toString(), null, "tfa.log");    
         if ($tfaCollection->count() == 1) {
             $this->addActivity($userId);
             return true;
