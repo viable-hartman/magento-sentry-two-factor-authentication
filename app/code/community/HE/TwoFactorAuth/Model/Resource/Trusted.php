@@ -28,7 +28,7 @@ class HE_TwoFactorAuth_Model_Resource_Trusted extends Mage_Core_Model_Resource_D
             'user_id' => $userId,
             'device_name' => $userAgent,
             'token' => $token,
-            'last_ip' => $ipAddress,
+            'ip' => $ipAddress,
         ];
     }
 
@@ -60,7 +60,7 @@ class HE_TwoFactorAuth_Model_Resource_Trusted extends Mage_Core_Model_Resource_D
         $cookieToken = Mage::getModel("core/cookie")->get("he_tfa_trusted");
         $tfaCollection = Mage::getModel("he_twofactorauth/trusted")->getCollection()
             ->addFieldToFilter("device_name", array("eq" => $userAgent))
-            ->addFieldToFilter("last_ip", array("eq" => $ipAddress))
+            ->addFieldToFilter("ip", array("eq" => $ipAddress))
             ->addFieldToFilter("user_id", array("eq" => $user->getId()))
             ->addFieldToFilter("token", array("eq" => $cookieToken));
         if ($tfaCollection->count() == 1) {

@@ -27,7 +27,7 @@ $table->addColumn('device_name', Varien_Db_Ddl_Table::TYPE_TEXT, 255, [
 $table->addColumn('token', Varien_Db_Ddl_Table::TYPE_TEXT, 255, [
     'nullable' => false,
 ], 'Token');
-$table->addColumn('last_ip', Varien_Db_Ddl_Table::TYPE_TEXT, 16, [
+$table->addColumn('ip', Varien_Db_Ddl_Table::TYPE_TEXT, 39, [
     'nullable' => false,
 ], 'Device IP address');
 
@@ -43,8 +43,8 @@ $table->addForeignKey(
     Varien_Db_Ddl_Table::ACTION_CASCADE
 );
 
-$uniqueName = $this->getIdxName($tableName, ['user_id', 'device_name', 'last_ip']);
-$table->addIndex($uniqueName, ['user_id', 'device_name', 'last_ip'], [
+$uniqueName = $this->getIdxName($tableName, ['user_id', 'device_name', 'ip']);
+$table->addIndex($uniqueName, ['user_id', 'device_name', 'ip'], [
     'type' => Varien_Db_Adapter_Interface::INDEX_TYPE_UNIQUE,
 ]);
 

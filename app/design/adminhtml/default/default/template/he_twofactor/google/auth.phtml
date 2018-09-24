@@ -99,12 +99,11 @@
                                     id="tfa_trust_device"
                                     name="tfa_trust_device"
                                     value="1"
-                                    data-bind='checked: checked'
                                     type="checkbox"
                              />
 
                             <label for="tfa_trust_device">
-                                <span>Trust this device, do not ask again</span>
+                                <span><?php echo Mage::helper('he_twofactorauth')->__('Trust this device, do not ask again') ?></span>
                             </label>
                         </div>
 
