@@ -91,6 +91,23 @@
                     <div class="input-box forgot-password"><label for="input_code"><?php echo Mage::helper('adminhtml')->__('Security Code'); ?></label><br />
                         <input type="text" id="input_code" name="input_code" value="" class="required-entry input-text" style="width:461px;" autocomplete="off"/>
                     </div>
+
+                    <?php if ($trustedHelper->isTrustedDevicesEnabled()): ?>
+
+                        <div class="tfa_trusted">
+                            <input
+                                    id="tfa_trust_device"
+                                    name="tfa_trust_device"
+                                    value="1"
+                                    type="checkbox"
+                             />
+
+                            <label for="tfa_trust_device">
+                                <span><?php echo Mage::helper('he_twofactorauth')->__('Trust this device, do not ask again') ?></span>
+                            </label>
+                        </div>
+
+                    <?php endif; ?>
                 <?php } ?>
 
                 <?php echo $this->getChildHtml('form.additional.info'); ?>
