@@ -6,6 +6,7 @@ app/design/adminhtml/default/default/template/he_twofactor     	app/design/admin
 js/he_twofactor							js/he_twofactor
 lib/Duo								lib/Duo
 lib/GoogleAuthenticator				lib/GoogleAuthenticator
+lib/PhpUserAgent				    lib/PhpUserAgent
 app/etc/modules/HE_TwoFactorAuth.xml      app/etc/modules/HE_TwoFactorAuth.xml
 skin/adminhtml/default/default/he_twofactor  skin/adminhtml/default/default/he_twofactor
 

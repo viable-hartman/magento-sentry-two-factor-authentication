@@ -35,13 +35,13 @@
         // $msg = Mage::helper('he_twofactorauth')->__('Please complete the Google two factor authentication');
         // Mage::getSingleton('adminhtml/session')->addNotice($msg);
     }
-    else { 
+    else {
         $g2fa = Mage::getModel("he_twofactorauth/validate_google");
         $secret = $g2fa->generateSecret();
         $qr_url = $g2fa->generateQRCodeUrl($secret, $user->getUsername());
         $msg = Mage::helper('he_twofactorauth')->__('You must set up your Google Authenticator app using the QR code below.');
-        Mage::getSingleton('adminhtml/session')->addNotice($msg);  
-        // TODO figure out message weirdness      
+        Mage::getSingleton('adminhtml/session')->addNotice($msg);
+        // TODO figure out message weirdness
     }
 
 ?>
@@ -73,7 +73,7 @@
                     <?php echo $this->getMessagesBlock()->getGroupedHtml(); ?>
                 </div>
 
-                <?php if (!empty($qr_url)) {  // SHOW the QR code so they can set up their authenticator ?>                    
+                <?php if (!empty($qr_url)) {  // SHOW the QR code so they can set up their authenticator ?>
 
                     <p align='center'><img src="<?php echo $qr_url; ?>" /></p>
                     <input type="hidden" name="google_secret" value="<?php echo $secret; ?>"    />
@@ -92,7 +92,7 @@
                         <input type="text" id="input_code" name="input_code" value="" class="required-entry input-text" style="width:461px;" autocomplete="off"/>
                     </div>
 
-                    <?php if ($trustedHelper->isTrustedDevicesEnabled()): ?>
+                    <?php if (Mage::helper('he_twofactorauth/trusted')->isTrustedDevicesEnabled()): ?>
 
                         <div class="tfa_trusted">
                             <input
@@ -120,7 +120,7 @@
                         <button class="forgot-password" type="submit"><span><span><span><?php echo Mage::helper('adminhtml')->__('Continue'); // TODO need better/clearer wording here? ?></span></span></span></button>
 
                     <?php } else { ?>
-                       
+
                         <button class="forgot-password" type="submit"><span><span><span><?php echo Mage::helper('adminhtml')->__('Submit Code'); ?></span></span></span></button>
 
                     <?php } ?>
