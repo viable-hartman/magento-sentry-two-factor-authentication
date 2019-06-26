@@ -41,6 +41,19 @@
                     </he_twofactorauth_observer_check>
                 </observers>
             </controller_action_predispatch_adminhtml>
+            <!--
+                The 2FA module, breaks when password is expired for an user.
+                We disable the default magento observer `enterprise_pci`
+                and fire a custom event `twofactor_auth_verification_success`
+                to manually call the observer method
+            -->
+            <admin_user_authenticate_after>
+                <observers>
+                    <enterprise_pci>
+                        <type>disabled</type>
+                    </enterprise_pci>
+                </observers>
+            </admin_user_authenticate_after>
         </events>
 
         <resources>
@@ -71,19 +84,6 @@
 
     <adminhtml>
         <events>
-            <!--
-                The 2FA module, breaks when password is expired for an user.
-                We disable the default magento observer `enterprise_pci`
-                and fire a custom event `twofactor_auth_verification_success`
-                to manually call the observer method
-            -->
-            <admin_user_authenticate_after>
-                <observers>
-                    <enterprise_pci>
-                        <type>disabled</type>
-                    </enterprise_pci>
-                </observers>
-            </admin_user_authenticate_after>
             <admin_session_user_login_failed>
                 <observers>
                     <sd_enterprise_pci>
