@@ -28,6 +28,13 @@ class HE_TwoFactorAuth_Model_Observer
             return;
         }
 
+        // check if user is excluded from two factor.
+        $user = $observer->getEvent()->getUser();
+        if (isset($user) && $user->getTwofactorDisable()) {
+            Mage::getSingleton('admin/session')->set2faState(HE_TwoFactorAuth_Model_Validate::TFA_STATE_ACTIVE);
+            return;
+        }
+
         $trustedHelper = Mage::helper("he_twofactorauth/trusted");
         $trustedModel = Mage::getModel("he_twofactorauth_resource/trusted");
         if ($trustedHelper->isTrustedDevicesEnabled() && $trustedModel->findActivity()) {
@@ -172,7 +179,6 @@ class HE_TwoFactorAuth_Model_Observer
      * Add a fieldset and field to the admin edit user form
      * in order to allow selective clearing of a users shared secret (google)
      */
-
     public function googleClearSecretCheck(Varien_Event_Observer $observer)
     {
         $block = $observer->getEvent()->getBlock();
@@ -213,9 +219,8 @@ class HE_TwoFactorAuth_Model_Observer
         }
     }
 
-
     /*
-     * Clear a user's google secret field if request
+     * Clear a user's google secret if field in request
      *
      */
     public function googleSaveClear(Varien_Event_Observer $observer)
@@ -228,14 +233,81 @@ class HE_TwoFactorAuth_Model_Observer
             if (isset($params['clear_google_secret'])) {
                 if ($params['clear_google_secret'] == 1) {
                     $object = $observer->getEvent()->getObject();
-                    $object->setTwofactorGoogleSecret(''); // just clear the secret
-
+                    $object->setTwofactorGoogleSecret(''); // Clear the secret
+                    // Let's also clear out any trusted devices.
+                    $trustedModel = Mage::getModel("he_twofactorauth_resource/trusted");
+                    $trustedModel->clearActivity($object->getId());
                     Mage::log(
                         "Clearing google secret for admin user (" . $object->getUsername() . ")", 0,
                         "two_factor_auth.log"
                     );
                 }
             }
+        }
+    }
+
+    /* 
+     * Add a fieldset and field to the admin edit user form
+     * in order to allow selectively disabling twofactor authentication for a user.
+     */
+    public function perUserTwoFactorCheck(Varien_Event_Observer $observer)
+    {
+        $block = $observer->getEvent()->getBlock();
+
+        if (!isset($block)) {
+            return $this;
+        }
+
+        if ($block->getType() == 'adminhtml/permissions_user_edit_form') {
+
+            // check that google is set for twofactor authentication            
+            //create new custom fieldset 'website'
+            $form = $block->getForm();
+            $fieldset = $form->addFieldset(
+                'tfa_field', array(
+                                   'legend' => 'TwoFactor Authentication',
+                                   'class'  => 'fieldset-wide'
+                               )
+            );
+
+            $noYes = array(Mage::helper('adminhtml')->__('No'), Mage::helper('adminhtml')->__('Yes'));
+            $model = Mage::registry('permissions_user');
+            $fieldset->addField(
+                'tfa_checkbox', 'select', array(
+                              'label'              => Mage::helper('he_twofactorauth')->__('Disable TwoFactor'),
+                              'name'               => 'twofactor_disable',
+                              'value'              => $model->getTwofactorDisable(),
+                              'disabled'           => false,
+                              'options'            => $noYes,
+                              'after_element_html' => '<small><br />Check this and save to disable twofactor authentication for just this user.<br />You will need to uncheck to return to default user behavior.</small>',
+                              'tabindex'           => 1
+                          )
+            );
+        }
+    }
+
+
+    /*
+     * Disable a user's TwoFactor requirement if field in request
+     *
+     */
+    public function perUserTwoFactorDisable(Varien_Event_Observer $observer)
+    {
+        // check that a user record has been saved
+        $params = Mage::app()->getRequest()->getParams();
+
+        $object = $observer->getEvent()->getObject();
+        if (isset($params['twofactor_disable'])) {
+            if ($params['twofactor_disable'] == 1) {
+                $object->setTwofactorDisable(true);
+                Mage::log(
+                    "Disabling twofactor authentication for admin user (" . $object->getUsername() . ")", 0, "two_factor_auth.log"
+                );
+            } else if($params['twofactor_disable'] == 0) {
+                $object->setTwofactorDisable(false);
+            }
+        } else if( $object->getTwofactorDisable() == 1 ) { // This was set, and now isn't, so unset it.
+            $object->setTwofactorDisable(false);
         }
     }
 

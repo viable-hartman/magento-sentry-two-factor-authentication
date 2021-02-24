@@ -2,7 +2,7 @@
 <config>
     <modules>
         <HE_TwoFactorAuth>
-            <version>1.1.11</version>
+            <version>1.1.12</version>
         </HE_TwoFactorAuth>
     </modules>
     <global>
@@ -117,6 +117,11 @@
                         <class>he_twofactorauth/observer</class>
                         <method>googleClearSecretCheck</method>
                     </he_twofactorauth_observer>
+                    <he_twofactorauth_observer_disable>
+                        <type>model</type>
+                        <class>he_twofactorauth/observer</class>
+                        <method>perUserTwoFactorCheck</method>
+                    </he_twofactorauth_observer_disable>
                 </observers>
             </adminhtml_block_html_before>
 
@@ -127,6 +132,11 @@
                         <class>he_twofactorauth/observer</class>
                         <method>googleSaveClear</method>
                     </he_twofactorauth_observer>
+                    <he_twofactorauth_observer_disable>
+                        <type>model</type>
+                        <class>he_twofactorauth/observer</class>
+                        <method>perUserTwoFactorDisable</method>
+                    </he_twofactorauth_observer_disable>
                 </observers>
             </model_save_before>
 
@@ -191,6 +201,7 @@
             </duo>
             <control>
                 <logaccess>1</logaccess>
+                <trusted_device_duration>2592000</trusted_device_duration>
             </control>
         </he2faconfig>
     </default>

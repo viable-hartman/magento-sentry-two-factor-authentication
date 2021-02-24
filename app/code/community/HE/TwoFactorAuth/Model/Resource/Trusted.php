@@ -48,7 +48,18 @@ class HE_TwoFactorAuth_Model_Resource_Trusted extends Mage_Core_Model_Resource_D
     protected function addTokenCookie($token)
     {
         $cookie = Mage::getSingleton('core/cookie');
-        $cookie->set('he_tfa_trusted', $token ,31536000,'/');
+        $cookie->set('he_tfa_trusted', $token , $this->trustedHelper->getTrustedTime(), '/');
+    }
+
+    public function clearActivity($userId) {
+        $tfaCollection = Mage::getModel("he_twofactorauth/trusted")->getCollection()
+            ->addFieldToFilter("user_id", array("eq" => $userId));
+        if ($tfaCollection->count() >= 1) {
+            foreach ($tfaCollection as $tfa) {
+                $tfa->delete();
+            }
+        }
+        return $this;
     }
 
     public function findActivity()

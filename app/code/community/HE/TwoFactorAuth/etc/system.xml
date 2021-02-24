@@ -69,6 +69,22 @@
                             <show_in_website>1</show_in_website>
                         </trusted_device>
 
+                        <trusted_device_duration>
+                            <label>Trusted Device Duration</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>17</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <depends>
+                                <trusted_device>1</trusted_device>
+                            </depends>
+                            <comment>
+                                <![CDATA[
+                                    Duration in which you want to trust a device before having to Two Factor authenticate again.
+                                ]]>
+                            </comment>
+                        </trusted_device_duration>
+
                         <logaccess>
                             <label>Enable access logging</label>
                             <frontend_type>select</frontend_type>

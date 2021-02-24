@@ -27,6 +27,10 @@ class HE_TwoFactorAuth_Helper_Trusted extends Mage_Core_Helper_Abstract
     {
         return Mage::getStoreConfig('he2faconfig/control/trusted_device');
     }
+
+    public function getTrustedTime() {
+        return Mage::getStoreConfig('he2faconfig/control/trusted_device_duration');
+    }
 }
 
 ?>
